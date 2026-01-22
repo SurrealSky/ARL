@@ -6,28 +6,10 @@
 
 ## 1# 注明
 
-- **因为灯塔ARL的官方开源项目被删除了，所以建立了本开源项目留作备份，本项目所有内容均来自于[TophantTechnology/ARL](https://github.com/TophantTechnology/ARL)最新版本**
-- **ARL官方开源项目关闭的具体原因请看：[https://mp.weixin.qq.com/s/hM3t3lYQVqDOlrLKz3_TSQ](https://mp.weixin.qq.com/s/hM3t3lYQVqDOlrLKz3_TSQ)**
-- **ARL-NPoC（ARL核心）的最新源码备份：[https://github.com/Aabyss-Team/ARL-NPoC](https://github.com/Aabyss-Team/ARL-NPoC)**
-- **arl_file（ARL相关构建）的最新备份：[https://github.com/Aabyss-Team/arl_files](https://github.com/Aabyss-Team/arl_files)**
-- **在 `CentOS7/8/Rocky 8.10` 和 `Ubuntu20.04` 系统上，直接拉取运行本项目内的 `misc/setup-arl.sh` 即可安装，源码和docker安装都集成在了脚本中解放双手**
-- **Docker安装感谢 [@本间白猫](https://github.com/honmashironeko) 师傅维护的Docker镜像**
-- **ARL-Docker：[https://github.com/honmashironeko/ARL-docker](https://github.com/honmashironeko/ARL-docker)**
-- **ARL添加指纹脚本，感谢 [@msmoshang](https://github.com/msmoshang) 对本项目和ADD-ARL-Finger项目的维护**
-- **ADD-ARL-Finger：[https://github.com/msmoshang/ADD-ARL-Finger](https://github.com/msmoshang/ADD-ARL-Finger)**
-- **脚本现以支持国内服务器安装建议用源码安装，Docker安装采用Docker镜像加速的方式可能会不稳定抽风现象建议源码安装**
-- **去除自带指纹，转为自选添加提高脚本运行容错**
-- **新增控制台**
+- **原始项目：[TophantTechnology/ARL](https://github.com/TophantTechnology/ARL)最新版本**
+- **本项目来自于https://github.com/Aabyss-Team/ARL V2.6.3 版本进行的二次开发**
 
 **万分感谢以下为 ARL 后续维护和支持作出贡献的师傅们** :confetti_ball:
-
-<table>
-    <tr>
-        <td align="center"><img alt="msmoshang" src="https://avatars.githubusercontent.com/u/79931113?v=4" style="width: 100px;" /><br /><a href="https://github.com/msmoshang/ADD-ARL-Finger">@msmoshang</a></td>
-        <td align="center"><img alt="honmashironeko" src="https://avatars.githubusercontent.com/u/139044047?v=4" style="width: 100px;" /><br /><a href="https://github.com/honmashironeko/ARL-docker">@本间白猫</a></td>
-        <td align="center"><img alt="AabyssZG" src="https://avatars.githubusercontent.com/u/54609266?v=4" style="width: 100px;" /><br /><a href="https://github.com/AabyssZG">@AabyssZG</a></td>
-    </tr>
-</table>
 
 ---
 
@@ -60,38 +42,7 @@ systemctl status nginx
 
 源码安装后，请前往ARL-Web页面：`https://IP:5003/`
 
-原账号密码：`admin`,`arlpass`
-
-新版账号密码为随机生成，会打印在控制台
-
-Docker安装暂时提供单个选择，如下：
-
-```
-1) honmashironeko/ARL-docker：本间白猫ARL-Docker版
-```
-
-执行完脚本确认没报错后，请前往ARL-Web页面：`https://IP:5003/`：账号：`admin`，密码：`honmashironeko`
-
-> ~~本项目已经替换完毕：如需构建本项目，在拉取和运行脚本时，要将 `TophantTechnology/ARL` / `1c3z/ARL-NPoC` / `1c3z/arl_files` 这三个字符串替换为 `Aabyss-Team/ARL` / `Aabyss-Team/ARL-NPoC` / `Aabyss-Team/arl_files`~~
-
----
-
-### 1.2 问题反馈
-
-近期发现本项目的Issues和Bug比较多，有问题欢迎进群咨询：
-
-<table>
-  <tr>
-    <td><img src="Team.jpg" alt="" /></td>
-    <td><img src="Aabyss-Bot.jpg" alt="" /></td>
-  </tr>
-</table>
-
-### 1.3 万分感谢各位师傅的Star
-
-[![Star History Chart](https://api.star-history.com/svg?repos=Aabyss-Team/ARL&type=Date)](https://star-history.com/#Aabyss-Team/ARL&Date)
-
-资产灯塔，不仅仅是域名收集
+账号密码为随机生成，会打印在控制台
 
 ## 2# 简介
 
@@ -117,7 +68,7 @@ Docker安装暂时提供单个选择，如下：
 
 ## 4# 系统要求
 
-目前暂不支持Windows，初次体验可采用Docker方式运行，长期使用建议采用源码安装方式运行。系统配置建议：CPU:4线程 内存:8G 带宽:10M。  
+目前暂不支持Windows，系统配置建议：CPU:4线程 内存:8G 带宽:10M。  
 由于自动资产发现过程中会有大量的的发包，建议采用云服务器可以带来更好的体验。
 
 
