@@ -17,5 +17,5 @@ l=o.a.create({baseURL:"/api",timeout:30e3});
 
 ## python环境
 
-- 确保环境中存在 **python3.6,pip3.6** 版本，并且命令可用。
+- 确保环境中存在 **python3.6 , pip3.6** 版本，并且命令可用。
 
