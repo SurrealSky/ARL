@@ -8,14 +8,11 @@
 
 - **原始项目：[TophantTechnology/ARL](https://github.com/TophantTechnology/ARL)最新版本**
 - **本项目来自于https://github.com/Aabyss-Team/ARL V2.6.3 版本进行的二次开发**
-
-**万分感谢以下为 ARL 后续维护和支持作出贡献的师傅们** :confetti_ball:
-
----
+- **本项目目前去除了docker安装功能，仅支持源码安装**
 
 ### 1.1 如何安装ARL
 
-**ARL安装命令如下（源码安装和Docker安装合一）**
+**ARL安装命令如下**
 
 ```
 #国外
@@ -28,7 +25,7 @@ chmod +x setup-arl.sh
 ./setup-arl.sh
 ```
 
-如果选择的是源码安装，可以通过以下命令确认服务状态（如果全部运行正常那就没问题）：
+通过以下命令确认服务状态（如果全部运行正常那就没问题）：
 
 ```
 systemctl status mongod
@@ -40,7 +37,7 @@ systemctl status arl-scheduler
 systemctl status nginx
 ```
 
-源码安装后，请前往ARL-Web页面：`https://IP:5003/`
+安装后，请前往ARL-Web页面：`https://IP:5003/`
 
 账号密码为随机生成，会打印在控制台
 
