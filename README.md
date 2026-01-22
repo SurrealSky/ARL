@@ -169,11 +169,6 @@ Docker环境配置文件路径 `docker/config-docker.yaml`
 
 当忘记了登录密码，可以执行下面的命令，然后使用 `admin/admin123` 就可以登录了。
 ```
-#Dockers忘记密码
-docker exec -ti arl_mongodb mongo -u admin -p admin
-use arl
-db.user.drop()
-db.user.insert({ username: 'admin',  password: hex_md5('arlsalt!@#'+'admin123') })
 #源码忘记密码
 mongo
 use arl
