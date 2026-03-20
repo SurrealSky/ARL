@@ -28,7 +28,7 @@ function systemctl_all() {
   fi
 
   for service in "${services[@]}"; do
-    systemctl "$cmd" "$service"
+    systemctl "$cmd" "$service" --no-pager --full
     if [[ $? -ne 0 ]]; then
       echo -e "${RED}错误：$cmd ${service} 失败${NC}"
     else
@@ -55,6 +55,7 @@ function stop() {
 
 function status() {
   systemctl_all status
+  read -r -p "按 Enter 键继续..."
 }
 
 function disable() {

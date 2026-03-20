@@ -38,6 +38,10 @@ systemctl status nginx
 
 账号密码为随机生成，会打印在控制台
 
+### 1.3 安装问题
+
+1.查看/opt/ARL/arl_worker.log文件，涉及执行权限问题，请使用命令 sudo chmod -R 777 /opt/ARL 解决。
+
 ## 3# 系统要求
 
 目前暂不支持Windows，系统配置建议：CPU:4线程 内存:8G 带宽:10M。  
