@@ -20,6 +20,30 @@ ARL_DIR="$BASE_DIR/ARL"
 ARL_NPoC_DIR="$BASE_DIR/ARL-NPoC"
 GEO_DATA_DIR="/data/GeoLite2"
 
+# 国内常用下载链接 (GitCode)
+GITCODE_BASE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs"
+GITCODE_BASE_URL_ARL="https://raw.gitcode.com/msmoshang/ARL/blobs"
+GITCODE_BASE_URL_ADDF="https://raw.gitcode.com/msmoshang/ADD-ARL-Finger/blobs"
+NUCLEI_URL_CN="$GITCODE_BASE_URL/23658ed3383635877d517345be25df36bfdf774f/nuclei_3.3.9_linux_amd64.zip"
+WIH_URL_CN="$GITCODE_BASE_URL/ca1f54e9ea46855fea153cb76fb854e870d3bd8a/wih_linux_amd64"
+NCRACK_URL_CN="$GITCODE_BASE_URL/9a6b0fbf8b9e377e1ed234347a3097c5c28ebd8d/ncrack"
+NCRACK_SERVICES_URL_CN="$GITCODE_BASE_URL/cfd6e29efb2ab97e84f346206fe5d9719f242a8f/ncrack-services"
+GEO_ASN_URL_CN="$GITCODE_BASE_URL/0737adc55cb78b6b06973d55d6012d66bcc1d219/GeoLite2-ASN.mmdb"
+GEO_CITY_URL_CN="$GITCODE_BASE_URL/cb513cf65f6b6611bd3aa6b6ca61ccbed2858ec2/GeoLite2-City.mmdb"
+ADD_FINGER_SCRIPT_URL="$GITCODE_BASE_URL_ADDF/29d142c75881c6c75d7a20bae4f5c33a5b08bf81/ADD-ARL-finger.py"
+DEFAULT_FINGER_URL="$GITCODE_BASE_URL_ARL/882cce400c6038c71f168e7d2bc180fedb5ca8f0/finger.json"
+GET_PIP_SCRIPT_CN="$GITCODE_BASE_URL/fd48c7fdef802d8bb86ace74134c553f0317258c/get-pip.py"
+
+# 国外常用下载链接 (GitHub/Git.io)
+GITHUB_BASE_URL="https://raw.githubusercontent.com/msmoshang/arl_files/master"
+NUCLEI_URL="https://github.com/projectdiscovery/nuclei/releases/download/v3.3.9/nuclei_3.3.9_linux_amd64.zip"
+WIH_URL="$GITHUB_BASE_URL/wih/wih_linux_amd64"
+NCRACK_URL="$GITHUB_BASE_URL/ncrack"
+NCRACK_SERVICES_URL="$GITHUB_BASE_URL/ncrack-services"
+GEO_ASN_URL="https://git.io/GeoLite2-ASN.mmdb" 
+GEO_CITY_URL="https://git.io/GeoLite2-City.mmdb"
+GET_PIP_SCRIPT="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+
 #-----------------------------
 # 基础功能函数
 #-----------------------------
@@ -263,11 +287,7 @@ install_pip36() {
 
 # 判断是否为国内网络环境 (根据能否访问 google.com)
 is_cn_env() {
-  if  ping -c 1 -W 3  www.google.com &>/dev/null;then
     return 1
-  else
-    return 0
-  fi
 }
 
 # 获取 MongoDB 安装源配置 (根据发行版和版本)
