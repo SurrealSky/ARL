@@ -20,28 +20,6 @@ ARL_DIR="$BASE_DIR/ARL"
 ARL_NPoC_DIR="$BASE_DIR/ARL-NPoC"
 GEO_DATA_DIR="/data/GeoLite2"
 
-# 国内常用下载链接 (GitCode)
-GITCODE_BASE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs"
-NUCLEI_URL_CN="$GITCODE_BASE_URL/23658ed3383635877d517345be25df36bfdf774f/nuclei_3.3.9_linux_amd64.zip"
-WIH_URL_CN="$GITCODE_BASE_URL/ca1f54e9ea46855fea153cb76fb854e870d3bd8a/wih_linux_amd64"
-NCRACK_URL_CN="$GITCODE_BASE_URL/9a6b0fbf8b9e377e1ed234347a3097c5c28ebd8d/ncrack"
-NCRACK_SERVICES_URL_CN="$GITCODE_BASE_URL/cfd6e29efb2ab97e84f346206fe5d9719f242a8f/ncrack-services"
-GEO_ASN_URL_CN="$GITCODE_BASE_URL/0737adc55cb78b6b06973d55d6012d66bcc1d219/GeoLite2-ASN.mmdb"
-GEO_CITY_URL_CN="$GITCODE_BASE_URL/cb513cf65f6b6611bd3aa6b6ca61ccbed2858ec2/GeoLite2-City.mmdb"
-ADD_FINGER_SCRIPT_URL="$GITCODE_BASE_URL/29d142c75881c6c75d7a20bae4f5c33a5b08bf81/ADD-ARL-finger.py"
-DEFAULT_FINGER_URL="$GITCODE_BASE_URL/882cce400c6038c71f168e7d2bc180fedb5ca8f0/finger.json"
-GET_PIP_SCRIPT_CN="$GITCODE_BASE_URL/fd48c7fdef802d8bb86ace74134c553f0317258c/get-pip.py"
-
-# 国外常用下载链接 (GitHub/Git.io)
-GITHUB_BASE_URL="https://raw.githubusercontent.com/msmoshang/arl_files/master"
-NUCLEI_URL="https://github.com/projectdiscovery/nuclei/releases/download/v3.3.9/nuclei_3.3.9_linux_amd64.zip"
-WIH_URL="$GITHUB_BASE_URL/wih/wih_linux_amd64"
-NCRACK_URL="$GITHUB_BASE_URL/ncrack"
-NCRACK_SERVICES_URL="$GITHUB_BASE_URL/ncrack-services"
-GEO_ASN_URL="https://git.io/GeoLite2-ASN.mmdb" 
-GEO_CITY_URL="https://git.io/GeoLite2-City.mmdb"
-GET_PIP_SCRIPT="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
-
 #-----------------------------
 # 基础功能函数
 #-----------------------------
@@ -523,14 +501,6 @@ sources_shell() {
     fi
 }
 
-# 检查并安装 Docker 相关的工具
-check_and_install_docker_tools() {
-    local tools=("wget" "tar" "iptables")
-    for tool in "${tools[@]}"; do
-        install_package "$tool"
-    done
-}
-
 # 检查并关闭 SELinux 和防火墙
 check_selinux() {
     # 禁用防火墙
@@ -586,65 +556,6 @@ fixed_check_osver() {
     color_echo $GREEN "检测到操作系统: $os_ver"
 }
 
-# 检查 Docker 运行状态
-check_run_docker() {
-    local status=$(systemctl is-active docker)
-    case "$status" in
-    active)
-        color_echo $GREEN "Docker 运行正常。"
-        ;;
-    inactive|unknown)
-        color_echo $YELLOW "Docker 服务未运行，正在尝试启动..."
-        sudo systemctl start docker
-        if [ $? -eq 0 ]; then
-            color_echo $GREEN "Docker 启动成功。"
-        else
-            color_echo $RED "Docker 启动失败，请检查 Docker 安装和配置。"
-            exit 1
-        fi
-        ;;
-    *)
-        color_echo $RED "无法确定 Docker 状态。"
-        exit 1
-        ;;
-    esac
-}
-
-# 停止并删除 ARL Docker 容器
-uninstall_docker() {
-    local containers=("arl_rabbitmq" "arl_mongodb" "arl_web" "arl_work" "arl_scheduler")
-
-    # 停止容器
-    color_echo $YELLOW "正在停止 ARL 相关容器..."
-    for container in "${containers[@]}"; do
-        if docker ps -a -q --filter "name=$container" &>/dev/null; then
-            docker stop "$container" &>/dev/null
-            if [ $? -eq 0 ]; then
-                color_echo $YELLOW "容器 $container 已停止."
-            else
-                color_echo $RED "容器 $container 停止失败。"  # 这里不退出，继续尝试停止其他容器
-            fi
-        else
-            color_echo $YELLOW "容器 $container 未找到."
-        fi
-    done
-
-    # 删除容器
-    color_echo $YELLOW "正在删除 ARL 相关容器..."
-    for container in "${containers[@]}"; do
-        if docker ps -a -q --filter "name=$container" &>/dev/null; then
-            docker rm "$container" &>/dev/null
-            if [ $? -eq 0 ]; then
-                color_echo $YELLOW "容器 $container 已删除."
-            else
-                color_echo $RED "容器 $container 删除失败。"
-            fi
-        else
-            color_echo $YELLOW "容器 $container 未找到."
-        fi
-    done
-}
-
 # 检查并安装指定版本的 PyYAML
 check_and_install_pyyaml() {
     local required_version="5.4.1"
@@ -689,194 +600,6 @@ add_check_nginx_log_format() {
     fi
 }
 
-check_install_docker_CN(){
-    check_and_install_docker_tools
-    local MAX_ATTEMPTS=3
-    local ATTEMPT=0
-    local SUCCESS=false
-    local CPU_ARCH=$(uname -m)
-    local SAVE_PATH="/opt/docker_tgz"
-    mkdir -p $SAVE_PATH
-    local DCOKER_VER="docker-27.1.1.tgz"
-    case $CPU_ARCH in
-        "arm64" | "aarch64")
-            DOCKER_COMPOSE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs/362611e3d3d50ddea6c1c179e76364dcb8d317d5/${DCOKER_VER}"
-        ;;
-        "x86_64")
-            DOCKER_COMPOSE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs/2062dee5a2b85f820fc7e56a8e238525a3b06ea3/${DCOKER_VER}"
-        ;;
-        *)
-            color_echo $RED "不支持的CPU架构: $CPU_ARCH"
-            exit 1
-        ;;
-    esac
-if ! command -v docker &> /dev/null; then
-  while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    ATTEMPT=$((attempt + 1))
-    color_echo $YELLOW "Docker 未安装，正在安装..."
-    wget -P "$SAVE_PATH" "$DOCKER_COMPOSE_URL"
-    if [ $? -eq 0 ]; then
-        SUCCESS=true
-        break
-    fi
-    color_echo $RED "Docker 安装失败，正在尝试重新下载 (尝试次数: $ATTEMPT)"
-  done
-
-  if $SUCCESS; then
-     tar -xzf $SAVE_PATH/$DCOKER_VER -C $SAVE_PATH
-     \cp $SAVE_PATH/docker/* /usr/bin/
-     rm -rf $SAVE_PATH
-     color_echo $GREEN "Docker 安装成功，版本为：$(docker --version)"
-     
-     cat > /usr/lib/systemd/system/docker.service <<EOF
-[Unit]
-Description=Docker Application Container Engine
-Documentation=https://docs.docker.com
-After=network-online.target firewalld.service
-Wants=network-online.target
-[Service]
-Type=notify
-ExecStart=/usr/bin/dockerd
-ExecReload=/bin/kill -s HUP 
-LimitNOFILE=infinity
-LimitNPROC=infinity
-LimitCORE=infinity
-TimeoutStartSec=0
-Delegate=yes
-KillMode=process
-Restart=on-failure
-StartLimitBurst=3
-StartLimitInterval=60s
-[Install]
-WantedBy=multi-user.target
-EOF
-    sudo systemctl daemon-reload
-    sudo systemctl restart docker
-    check_run_docker
-    sudo systemctl enable --now docker
-  else
-    color_echo $RED "Docker 安装失败，请检查网络或手动安装。"
-    exit 1
-  fi
-else 
-    color_echo $GREEN "Docker 安装成功, 版本: $(docker --version)"
-fi
-}
-
-# 国内环境：安装 Docker Compose (使用阿里云镜像)
-check_install_docker-compose_CN() {
-    if ! command -v docker-compose &> /dev/null; then
-        color_echo $YELLOW "Docker Compose 未安装，正在安装..."
-
-    # 下载 docker-compose
-        local CPU_ARCH
-        CPU_ARCH=$(uname -m)
-        local OS
-        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-
-        case "$CPU_ARCH" in
-            x86_64)
-                DOCKER_COMPOSE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs/72eb38523db2f2c0b9645b2597d3ed9c9e778c7e/docker-compose-${OS}-${CPU_ARCH}"
-            ;;
-            "arm64" | "aarch64")
-                DOCKER_COMPOSE_URL="https://raw.gitcode.com/msmoshang/arl_files/blobs/91c90fdb2223045dcac604736d5428d1ae40d018/docker-compose-${OS}-${CPU_ARCH}"
-            ;;
-            *)
-                color_echo $RED "不支持的 CPU 架构: $CPU_ARCH"
-                exit 1
-            ;;
-        esac
-        sudo curl -L "$DOCKER_COMPOSE_URL" -o /usr/local/bin/docker-compose
-        if [ $? -eq 0 ];then
-            sudo chmod +x /usr/local/bin/docker-compose
-            color_echo $GREEN "Docker Compose 安装成功, 版本: $(docker-compose --version)"
-        else
-            color_echo $RED "Docker Compose 安装失败，请检查网络或手动安装。"
-            exit 1
-        fi
-    else
-        color_echo $GREEN "Docker Compose 已安装, 版本: $(docker-compose --version)"
-    fi
-}
-
-# 国外环境：安装 Docker (使用官方源)
-check_install_docker() {
-    check_and_install_docker_tools
-
-    if ! command -v docker &> /dev/null; then
-        color_echo $YELLOW "Docker 未安装，正在安装..."
-        sudo curl -fsSL "https://get.docker.com" | sudo sh
-        if [ $? -eq 0 ]; then
-            color_echo $GREEN "Docker 安装成功, 版本: $(docker --version)"
-            sudo systemctl enable --now docker
-            check_run_docker
-        else
-            color_echo $RED "Docker 安装失败，请检查网络或手动安装。"
-            exit 1
-        fi
-    else
-        color_echo $GREEN "Docker 已安装, 版本: $(docker --version)"
-        sudo systemctl restart docker
-        check_run_docker
-    fi
-}
-
-# 国外环境：安装 Docker Compose(使用官方源)
-check_install_docker-compose() {
-    if ! command -v docker-compose &> /dev/null; then
-        color_echo $YELLOW "Docker Compose 未安装，正在安装..."
-        
-        # 获取最新版本
-        local DOCKER_COMPOSE_VERSION
-        DOCKER_COMPOSE_VERSION=$(curl -s "https://api.github.com/repos/docker/compose/releases/latest" | grep 'tag_name' | cut -d\" -f4)
-        
-        # 获取 CPU 架构
-        local CPU_ARCH
-        CPU_ARCH=$(uname -m)
-        
-        # 确定文件名和下载链接
-        local OS
-        OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-        local FILE_NAME="docker-compose-${OS}-${CPU_ARCH}"
-        local DOCKER_COMPOSE_URL="https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/${FILE_NAME}"
-        local SHA256_FILE_NAME="${FILE_NAME}.sha256"
-        local SHA256_URL="https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/${SHA256_FILE_NAME}"
-        
-        # 下载并验证 Docker Compose
-        if [ -n "$DOCKER_COMPOSE_VERSION" ]; then
-            # 检查并获取校验和
-            local EXPECTED_SHA256
-            EXPECTED_SHA256=$(curl -s "${SHA256_URL}" | awk '{print $1}')
-            
-            # 下载 Docker Compose 二进制文件
-            sudo curl -fL "${DOCKER_COMPOSE_URL}" -o /usr/local/bin/docker-compose
-            if [ $? -ne 0 ]; then
-                color_echo $RED "Docker Compose 下载失败！请手动安装。"
-                exit 1
-            fi
-            
-            # 验证文件完整性
-            local ACTUAL_SHA256
-            ACTUAL_SHA256=$(sha256sum /usr/local/bin/docker-compose | awk '{print $1}')
-            
-            if [ "${ACTUAL_SHA256}" != "${EXPECTED_SHA256}" ]; then
-                sudo rm -f /usr/local/bin/docker-compose
-                color_echo $RED "Docker Compose 文件校验失败！请手动安装。"
-                exit 1
-            fi
-            
-            # 设置权限
-            sudo chmod +x /usr/local/bin/docker-compose
-            color_echo $GREEN "Docker Compose 安装成功, 版本: $(docker-compose --version)"
-        else
-            color_echo $RED "无法获取 Docker Compose 的最新版本信息！"
-            exit 1
-        fi
-    else
-        color_echo $GREEN "Docker Compose 已安装, 版本: $(docker-compose --version)"
-    fi
-}
-
 # 安装 ARL 的通用步骤 (适用于所有环境和发行版)
 install_arl_common() {
     # 启动服务
@@ -886,12 +609,12 @@ install_arl_common() {
     done
 
     # 克隆 ARL 和 ARL-NPoC (根据网络环境选择源)
-    local arl_repo="https://github.com/msmoshang/ARL"
-    local arl_npoc_repo="https://github.com/Aabyss-Team/ARL-NPoC"
+    local arl_repo="https://github.com/SurrealSky/ARL"
+    local arl_npoc_repo="https://github.com/SurrealSky/ARL-NPoC"
 
     if is_cn_env; then
-        arl_repo="https://gitee.com/Aabyss-Team/ARL"
-        arl_npoc_repo="https://gitee.com/ms1125/ARL-NPoC"
+        arl_repo="https://gitee.com/SurrealSky/ARL"
+        arl_npoc_repo="https://gitee.com/SurrealSky/ARL-NPoC"
     fi
 
     if [ ! -d "$ARL_DIR" ]; then
@@ -1132,36 +855,6 @@ code_install() {
     esac
 }
 
-
-# Docker 安装菜单 (简化)
-docker_install_menu() {
-    check_and_install_git
-    print_separator
-    echo "请选择要安装的 ARL Docker 版本："
-    echo "1) arl-docker-all (honmashironeko 版, 暂时只支持国外环境)"
-    print_separator
-
-    read -r -p "请输入选项 (1): " version_choice
-
-    case "$version_choice" in
-        1)
-        color_echo $YELLOW "正在克隆 ARL-docker 项目..."
-        cd /opt/ || exit
-        if [ ! -d ARL-docker ]; then
-          git clone https://github.com/honmashironeko/ARL-docker
-        fi
-        cd ARL-docker || exit
-        chmod +x setup_docker.sh
-        bash setup_docker.sh
-        ;;
-    *)
-        color_echo $RED "无效的输入，请重新选择。"
-        sleep 2
-        docker_install_menu
-        ;;
-    esac
-}
-
 # 主菜单
 main_menu() {
     clear
@@ -1171,11 +864,9 @@ main_menu() {
     echo "首次安装建议先进行换源操作。"
     echo "1) 切换镜像源 (使用LinuxMirrors)"
     echo "2) 源码安装 (支持 CentOS 7/8, Ubuntu 20.04, 区分国内外环境)"
-    echo "3) Docker 安装 (目前仅支持国外环境)"
-    echo "4) 卸载 ARL (停止并删除 Docker 容器)"
-    echo "5) 添加指纹 (默认 7k+ 指纹, 仅限源码安装)"
-    echo "6) 安装ARL管理面板"
-    echo "7) 退出脚本"
+    echo "3) 添加指纹 (默认 7k+ 指纹, 仅限源码安装)"
+    echo "4) 安装ARL管理面板"
+    echo "5) 退出脚本"
     print_separator
     read -r -p "请输入对应数字: " code_id
 
@@ -1190,44 +881,13 @@ main_menu() {
         ipinfo
         out_pass          
         ;;
-    3) # Docker 安装
-        print_separator
-        echo "请选择安装环境："
-        echo "1) 国外环境"
-        echo "2) 国内环境"
-        print_separator
-
-        read -r -p "请输入选项 (1 或 2): " env_choice
-
-        case "$env_choice" in
-            1)  # 国外环境
-                check_install_docker
-                check_install_docker-compose
-                docker_install_menu
-                ;;
-            2) # 国内环境
-                check_install_docker_CN
-                check_install_docker-compose_CN
-                docker_install_menu
-                ;;
-             *)
-                color_echo $RED "无效的输入，请重新选择。"
-                sleep 2
-                main_menu  # 返回主菜单
-                ;;
-        esac
-        ;;
-    4)  # 卸载 ARL
-        uninstall_docker
-        color_echo $GREEN "ARL 已卸载。"
-        ;;
-    5)  # 添加指纹
+    3)  # 添加指纹
         add_finger
         ;;
-    6)  # 安装面板
+    4)  # 安装面板
         manage_arl
         ;;
-    7)  # 退出
+    5)  # 退出
         exit 0
         ;;
     *)
